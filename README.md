@@ -40,3 +40,12 @@ HR-Analytics-Project/
 - Analyzed **fair pay** and **engagement trends** across departments and job levels.
 - Produced an **interactive HR analytics report** in HTML.
 
+## 📂 Project Modules
+
+- [HR Analytics – Workforce Insights](HR-Analytics/)  
+  Full end-to-end analysis of recruiting sources, engagement, attrition, and pay equity using R (Quarto notebooks + HTML report).
+
+- [Synthetic Data Generation](Hr_data_data.qmd)  
+  Scripts for creating realistic HR datasets for analytics demonstrations.
+
+
