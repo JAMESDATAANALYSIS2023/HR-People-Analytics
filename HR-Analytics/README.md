@@ -1,5 +1,5 @@
 # HR Analytics – Workforce Insights in R
-➡️ [View the rendered HR Analytics report](HR-Analytics/hr_analytics.html)
+➡️ [View the rendered HR Analytics report](HR-Analytics/HR_Analytics.html)
 
 
 This folder contains a complete HR analytics project using a **synthetic HR dataset**.
