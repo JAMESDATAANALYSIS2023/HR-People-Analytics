@@ -1,0 +1,238 @@
+---
+title: "HR_Analytics_Data"
+format: html
+editor: visual
+---
+
+# HR Analytics Project – Synthetic HR Datasets
+
+This project creates synthetic HR-related datasets to simulate common business questions in people analytics, such as pay equity, employee engagement, turnover prediction, recruiting source effectiveness, performance evaluation, and workplace safety.
+
+The generated CSV files can be used for: - Exploratory HR data analysis\
+- Predictive modeling (e.g., churn/attrition prediction)\
+- Dashboard creation in R Shiny, Tableau, or Power BI\
+- Portfolio projects to showcase HR analytics capabilities
+
+# Recruitment data
+
+(Hiring & Sales Quota)
+
+-   Variables:
+
+    -   attrition (Yes/No)
+
+    -   performance_rating (1-5)
+
+    -   sales_quota_pct (0.3 = 30% to 2.5 = 250% of target)
+
+    -   recruiting_source
+
+```{r}
+
+set.seed(105)
+n <- 500
+attrition <- sample(c("Yes","No"), n, TRUE)
+performance_rating <- sample(1:5, n, TRUE)
+sales_quota_pct <- round(runif(n, min = 0.3, max = 2.5), 3)
+recruiting_source <- sample(c("Applied Online","Campus","Referral ","Search Firm","N/A"), n, TRUE)
+
+recruitment_data <- data.frame(attrition, performance_rating, sales_quota_pct, recruiting_source)
+head(recruitment_data)
+tail(recruitment_data)
+write.csv(recruitment_data, "recruitment_data.csv", row.names = FALSE)
+
+```
+
+# Fair pay data
+
+(Compensation & Job Level)
+
+-   Variables:
+
+    -   employee_id
+
+    -   department
+
+    -   salary
+
+    -   new_hire (Yes/No)
+
+    -    job_level (Hourly, Salaried, Manager)
+
+```{r}
+# ---- Fair Pay Data ----
+set.seed(104)
+n <- 2000
+employee_id <- 1:n
+department <- sample(c("HR","IT","Finance","Operations","Marketing","Sales"), n, TRUE)
+salary <- round(rnorm(n, mean=70000, sd=15000), -2)
+new_hire <- sample(c("Yes","No"), n, TRUE, prob = c(0.3,0.7))
+job_level <- sample(c("Hourly","Salaried","Manager"), 
+                    n, 
+                    replace = TRUE)
+
+fair_pay <- data.frame(employee_id, department, salary, new_hire, job_level)
+head(fair_pay)
+tail(fair_pay)
+
+write.csv(fair_pay, "fair_pay_data.csv", row.names = FALSE)
+
+```
+
+# Performance review data
+
+(Annual Ratings)
+
+-   Variables:
+
+    -   employee_id
+
+    -   rating (1-5)
+
+```{r}
+set.seed(106)
+n <- 2000
+employee_id <- 1:n
+rating <- sample(1:5, n, TRUE)
+
+performance_data <- data.frame(employee_id, rating)
+head(performance_data)
+tail(performance_data)
+write.csv(performance_data, "performance_data.csv", row.names = FALSE)
+
+```
+
+# accident data
+
+```{r}
+set.seed(103)
+n <- 550
+year <- sample(2018:2024, n, TRUE)
+employee_id <- 1:n
+accident_type <- sample(c("Mild","Moderate","Severe"), n, TRUE)
+
+accident_data <- data.frame(year, employee_id, accident_type)
+head(accident_data)
+tail(accident_data)
+write.csv(accident_data, "accident_data.csv", row.names = FALSE)
+
+```
+
+# survey data 2
+
+(Yearly Engagement Tracking)
+
+-   Variables:
+
+    -   year
+
+    -   employee_id
+
+    -   engagement (1-5 scale)
+
+```{r}
+set.seed(102)
+n <- 2000
+year <- sample(2018:2024, n, replace = TRUE)
+employee_id <- 1:n
+engagement <- sample(1:5, n, replace = TRUE)
+
+survey_data_2 <- data.frame(year, employee_id, engagement)
+head(survey_data_2)
+tail(survey_data_2)
+write.csv(survey_data_2, "survey_data_2.csv", row.names = FALSE)
+
+```
+
+# survey data
+
+(Employee Satisfaction & Benefits Usage)
+
+-   Variables:
+
+    -   employee_id
+
+    -   department
+
+    -   engagement (1-5 scale)
+
+    -   salary (annual)
+
+    -   vacation (days allocated)
+
+    -   days_taken (days of vacation used)
+
+```{r}
+set.seed(101)
+n <- 3000
+employee_id <- 1:n
+department <- sample(c("Engineering", "HR","Finance","IT","Operations","Marketing","Sales"), n, TRUE)
+engagement <- sample(1:5, n, replace = TRUE)
+salary <- round(rnorm(n, mean=70000, sd=15000), -2)
+vacation <- sample(10:30, n, TRUE)
+Vacation_days_taken <- sample(0:30, n, TRUE)
+
+survey_data <- data.frame(employee_id, department, engagement, salary, vacation, Vacation_days_taken)
+head(survey_data)
+tail(survey_data)
+write.csv(survey_data, "survey_data.csv", row.names = FALSE)
+
+```
+
+# HR data 2
+
+(Overtime & Location)
+
+-   Variables:
+
+    -   year
+
+    -   employee_id
+
+    -   location
+
+    -   overtime_hours
+
+```{r}
+set.seed(107)
+n <- 4000
+year <- sample(2018:2024, n, TRUE)
+employee_id <- 1:n
+location <- sample(c("NY","TX","CA","FL","Remote"), n, TRUE)
+overtime_hours <- sample(0:50, n, TRUE)
+
+hr_data_2 <- data.frame(year, employee_id, location, overtime_hours)
+head(hr_data_2)
+tail(hr_data_2)
+write.csv(hr_data_2, "hr_data_2.csv", row.names = FALSE)
+```
+
+# HR data
+
+(Workforce Demographics)
+
+-   Variables:
+
+    -   employee_id
+
+    -   department
+
+    -   job_level (Hourly, Salaried, Manager)
+
+    -   gender
+
+```{r}
+set.seed(108)
+n <- 2000
+employee_id <- 1:n
+department <- sample(c("Engineering","Finance","IT","Operations","Marketing","Sales"), n, TRUE)
+job_level <- sample(c("Hourly","Salaried","Manager"), 
+                    n, 
+                    replace = TRUE)
+gender <- sample(c("Male","Female","Other"), n, TRUE)
+
+hr_data <- data.frame(employee_id, department, job_level, gender)
+head(hr_data)
+tail(hr_data)
+write.csv(hr_data, "hr_data.csv", row.names = FALSE)
+```

@@ -1,0 +1,418 @@
+---
+title: "HR Analytics: Recruitment & Engagement Insights"
+author: "James Peters"
+date: "2025-10-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# HR Analytics project in R: Exploring Workforce Insights Through Data
+
+
+Human Resources (HR) departments are increasingly expected to make **data-driven decisions** about how to attract, develop, and retain top talent. This case-based project demonstrates how **People Analytics** can be used to address real business questions using a synthetic HR dataset — all analyzed in **R**.
+
+You’ll learn how to:
+
+-   Clean, manipulate, and visualize HR data using tidyverse tools.
+
+-   Apply **descriptive** and **inferential statistics** to uncover meaningful workforce patterns.
+
+-   Build **predictive models** (e.g., logistic and linear regression) to inform strategic decisions.
+
+The analysis is organized into **five practical HR analytics scenarios**, each mirroring challenges analytics teams face in real organizations. For each, we use a combination of **summary statistics, hypothesis testing, and regression modeling** to arrive at actionable insights.
+
+
+**1. Identifying the Best Recruiting Source**
+
+Evaluate how different recruiting channels affect the **quality of hires**, **performance outcomes**, and **retention** rates.
+
+-   **Descriptive Statistics**: Performance and attrition by source
+
+-   **Statistical Tests**: ANOVA and Chi-square
+
+-   **Regression**: Logistic regression to predict attrition likelihood based on recruiting source
+
+
+**2. Understanding Low Employee Engagement**
+
+Engagement is a leading indicator of performance and retention. One department — **Sales** — appears to have lower engagement scores.
+
+-   **Business Question**: Is engagement in Sales statistically lower than in other departments? What factors contribute to disengagement?
+
+-   **Descriptive Exploration**: Vacation days, pay, performance, and tenure
+
+-   **Hypothesis Testing**:
+
+    -   Chi-square test for disengagement proportions
+
+    -   T-tests for vacation day differences
+
+-   **Regression**: Logistic regression to predict disengagement based on contributing factors
+
+
+**3. Assessing Pay Equity for New Hires**
+
+Explore whether new employees are being paid **equitably** compared to existing staff — and if these pay disparities affect **retention** or morale.
+
+-   **Statistical Tests**:
+
+    -   T-tests by gender, recruiting source, or department
+
+-   **Regression Modeling**:
+
+    -   Linear regression on salary as a function of gender, education, department, and experience
+
+
+**4. Evaluating Consistency in Performance Ratings**
+
+Are performance scores aligned with actual contributions — or influenced by **manager bias**, **department norms**, or **demographics**?
+
+-   **Descriptive Metrics**: Performance score distributions across departments
+
+-   **Statistical Tests**: ANOVA across teams
+
+-   **Regression**: Ordinal or logistic regression to analyze rating predictors
+
+
+**5. Improving Workplace Safety Using Data**
+
+Analyze trends in workplace incidents to guide **preventative safety interventions**.
+
+-   **Descriptive Statistics**: Incidents by department, time, and employee tenure
+
+-   **Statistical Tests**: Chi-square test for incident frequency across groups
+
+-   **Regression**: Logistic regression to predict likelihood of safety incidents
+
+**Identifying the Best Recruiting Source**
+
+\
+Evaluate how different recruiting channels impact the quality of new hires and overall retention.
+
+Import Dataset and load libraries
+
+
+### References & Acknowledgments
+
+This project builds upon concepts and datasets introduced in the following sources:
+
+-   **DataCamp** – *HR Analytics: Exploring Employee Data in R*\
+    Course content and synthetic HR dataset structure were used as the foundation for analysis and exercises.\
+    <https://www.datacamp.com/>
+
+-   **People Analytics: Using Data-Driven HR & Generative AI as a Business Advantage**\
+    Provided strategic context and inspiration for connecting HR analytics to real business decision-making.
+
+Additional HR analytics best practices were informed by public discussions on workforce analytics, people analytics, and HR data-driven decision-making trends.
+
+## 1. Identify the best recruiting source
+
+Import Dataset and load libraries
+
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+# Load the readr package
+recruitment <- read.csv("recruitment_data.csv")
+```
+
+Explore recruitment Data
+```{r}
+# Look at the first few rows of the dataset
+head(recruitment)
+# Look at the last few rows of the dataset
+tail(recruitment)
+```
+view
+```{r}
+View(recruitment)
+```
+Summary
+```{r}
+# Get an overview of the recruitment data
+summary(recruitment)
+```
+Structure
+```{r}
+str(recruitment)
+```
+dim
+```{r}
+dim(recruitment)
+```
+col names
+```{r}
+colnames(recruitment)
+```
+gliimpse
+```{r}
+glimpse(recruitment)
+```
+Missing values
+```{r}
+anyNA(recruitment)
+```
+# Identifying the Best Recruiting Source
+
+* Recruitment channels can differ widely in cost, candidate quality, and long-term retention.  
+* Analyzing these channels helps HR invest in the sources that yield **high-performing and long-tenured employees**, reducing turnover costs.
+
+## Identify the recruiting source
+```{r}
+recruit <-  recruitment |>  count(recruiting_source)
+recruit
+```
+## visualize recruiting sources
+```{r}
+ggplot(recruit, aes(x = reorder(recruiting_source, n), y = n)) + geom_col(fill = "steelblue") + coord_flip() + labs( title = "Number of Employees by Recruiting Source",  x = "Recruiting Source", y = "Number of Employees")
+```
+# Which recruiting channel produces the best and worst salespeople?
+
+## Avg sales numbers by recruiting source
+
+    Find the average sales quota attainment by recruiting source
+```{r}
+# Find the average sales quota attainment for each recruiting source.
+avg_sales <- recruitment |> group_by(recruiting_source) |> summarize(avg_sales_quota_pct = mean(sales_quota_pct))
+
+# Display the result
+avg_sales
+```
+Visualizing avg sale numbers by recruiting source
+```{r}
+ggplot(avg_sales, aes(x = reorder(recruiting_source, avg_sales_quota_pct),
+                      y = avg_sales_quota_pct)) + geom_col(fill = "steelblue") + coord_flip() + labs( title = "Average Sales Quota Attainment by Recruting Source", x = "Recruiting Source",  y = "Avg Sales Quota %" )
+```
+* Which recruiting channel produces the highest and lowest Attrition rates?
+
+# Attrition rates by recruiting source
+
+## Find the average attrition for the Sales team, by recruiting source, sorted from lowest attrition rate to highest
+
+```{r}
+avg_attrition <- recruitment |> 
+  group_by(recruiting_source) |> 
+  summarize(attrition_rate = mean(ifelse(attrition == "Yes", 1, 0), na.rm = TRUE)) |> arrange(attrition_rate)
+# Display the result
+avg_attrition
+```
+# Visualizing attrition rates by recruiting sources
+```{r}
+ggplot(avg_attrition, aes(x = reorder(recruiting_source, attrition_rate), 
+                          y = attrition_rate)) + geom_col(fill = "steelblue") + coord_flip() + labs( title = "Attrition Rate by Recruting Source", 
+                                                                                                     x = "Recruiting Source", y = "Attrition Rate (%)")
+```
+## Which recruiting source produce the highest and lowest Performance rates
+```{r}
+avg_performance <- recruitment |> 
+  group_by(recruiting_source) |> 
+  summarize(performance_rate = mean(performance_rating, na.rm = TRUE)) |> 
+  arrange(desc(performance_rate))
+
+# View result
+avg_performance
+```
+## visualize performance
+```{r}
+ggplot(avg_performance, aes(x = reorder(recruiting_source, performance_rate), 
+                            y = performance_rate)) + geom_col(fill = "steelblue") + coord_flip() + labs( title = "Performance Rate by Recruting Source", x = "Recruiting Source", y = "Performance Rate (%)")
+```
+## Statistical test
+
+- **Chi-Square Test:**  
+  Tests whether attrition (Yes/No) is **independent** of recruiting source, revealing if some sources lead to higher turnover.
+
+
+
+Chi-Square Test – Attrition vs Recruiting Source
+* Checks whether attrition status (Yes/No) is independent of recruiting source.
+
+```{r}
+# Create a contingency table
+tab <- table(recruitment$recruiting_source, recruitment$attrition)
+
+# View the table
+tab
+
+# Perform Chi-Square test
+chisq.test(tab)
+
+```
+Interpretation:
+
+We fail to reject the null hypothesis; attrition appears independent of recruiting source in this dataset.
+The observed attrition differences across Applied Online, Campus, N/A, Referral, and Search Firm could be due to random variation.
+
+
+### Regression Modeling
+
+- **Logistic Regression:**  
+  Predicts the probability of attrition (1 = left, 0 = stayed) using recruiting source as a predictor, possibly controlling for tenure, department, or salary.
+
+### Logistic Regression – Predict Attrition Likelihood
+* Models the probability of attrition (Yes=1, No=0) from source + other available metrics.
+```{r}
+# Ensure attrition is coded as a binary factor
+recruitment$attrition <- factor(recruitment$attrition, levels = c("No", "Yes"))
+
+# Fit logistic regression
+logit_model <- glm(attrition ~ recruiting_source + performance_rating + sales_quota_pct,
+                   data = recruitment,
+                   family = binomial)
+
+summary(logit_model)
+```
+In this dataset, recruiting source does not significantly predict attrition. Referral hires trend toward lower attrition (OR ≈ 0.63) but not at a strong significance level (p=0.09).
+Higher sales quota attainment shows a mild trend toward lower attrition (OR ≈ 0.77, p=0.07), but the effect is not clearly significant.
+Overall, the model suggests no strong predictors of attrition among these variables alone — additional features such as tenure, department, and salary would likely improve predictive accuracy.
+
+2. Understanding Low Employee Engagement
+
+# Import Suvey data
+```{r}
+survey <- read.csv("survey_data.csv")
+head(survey)
+tail(survey)
+```
+view
+```{r}
+View(survey)
+```
+Summary
+```{r}
+# Get an overview of the recruitment data
+summary(survey)
+```
+Structure
+```{r}
+str(survey)
+```
+dim
+```{r}
+dim(survey)
+```
+col names
+```{r}
+colnames(survey)
+```
+gliimpse
+```{r}
+glimpse(survey)
+```
+Missing values
+```{r}
+anyNA(survey)
+```
+
+# # **Which department has the lowest engagement?** What factors contribute to disengagement?
+
+## Examine the counts of the department variable.
+```{r}
+sur1 <- survey %>% 
+  count(department)
+sur1
+```
+visualize 
+```{r}
+ggplot(sur1, aes(x = department, y = n)) +
+  geom_col() +
+  labs(title = "Employee Count by Department",
+       x = "Department", y = "Count") +
+  theme_minimal()
+  
+```
+INterpretation: Sales highest and Finance lowest.
+
+
+
+```{r}
+# Output the average engagement score for each department, sorted
+survey %>%
+  group_by(department) %>%
+  summarize(avg_engagement = mean(engagement)) %>%
+  arrange(avg_engagement)
+```
+Interpretation: Department with the lowest engagement score. "IT"
+
+## **Comparing other factors by department**
+
+Another common way to think about engagement is identifying which employees are *disengaged*, which you'll define as having an engagement score of 1 or 2.
+
+```{r}
+# Create the disengaged variable and assign the result to survey
+survey_disengaged <- survey %>% 
+  mutate(disengaged = ifelse(engagement <= 2, 1, 0)) 
+
+survey_disengaged
+```
+## Summarize the three variables by department
+```{r}
+survey_summary <- survey_disengaged %>% 
+  group_by(department) %>% 
+  summarize(pct_disengaged = mean(disengaged),
+            avg_salary = mean(salary),
+            avg_vacation_days = mean(Vacation_days_taken))
+
+survey_summary
+```
+# **Visualizing several variables at once**
+```{r}
+library(tidyr)
+
+# Gather data for plotting
+survey_gathered <- survey_summary %>% 
+  gather(key = "measure", value = "value",
+         pct_disengaged, avg_salary, avg_vacation_days)
+```
+
+# **Visualizing several variables at once with facets**
+In the visualization you just created, the y-axis extended to fit `avg_salary`, which was in the thousands. That meant that you couldn't see the bars for the other two variables you were trying to study. Here you'll use faceting so that each variable plot has its own y-axis.
+
+```{r}
+# Create three faceted bar charts
+ggplot(survey_gathered, aes(measure, value, fill = department)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~ measure, scales = "free")
+```
+
+Conclusion: Exploratory analysis showed that one of the departments has the lowest average employee engagement score. fewest average vacation days taken.
+
+# **Statistical significance - disengaged employees**
+You've seen some evidence that the sales department has a higher proportion of disengaged employees than the rest of the company, but you aren't yet certain if that difference is significant. Now you can test whether that difference is statistically significant using the tests you just learned about.
+```{r}
+# Add the in_sales variable
+survey_eng <- survey %>%
+  mutate(in_engineering = ifelse(department == "Engineering", "Engineering", "Other"))
+
+survey_eng <- survey_disengaged %>%
+  mutate(in_engineering = ifelse(department == "Engineering", "Engineering", "Other"))
+```
+
+Use the correct statistical test to test the hypothesis that the sales department has the same proportion of disengaged employees as the rest of the company.
+```{r}
+# Test the hypothesis using survey_sales
+
+chisq.test(table(survey_eng$in_eng, survey_eng$disengaged))
+
+```
+Is the test result significant at the .05 level? Assign either `TRUE` or `FALSE` to `s
+
+```{r}
+# Is the result significant?
+significant <- TRUE
+```
+
+# **Statistical significance - vacation days**
+Your other observation was that employees in the sales department take fewer vacation days on average than the rest of the company. You can test whether that observation is statistically significant as well.
+
+```{r}
+# Test the hypothesis using the survey_sales data
+t.test(Vacation_days_taken ~ in_engineering, data = survey_eng)
+```
+
+
